@@ -1,0 +1,2 @@
+-> brew install python-tk
+-> pip install freegames
