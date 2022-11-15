@@ -27,10 +27,11 @@ class Agent:
         if variant==1:
             self.get_state = self.env.getState1
             self.dim = self.env.dim1
+            self.model = Linear_QNet(self.dim(), 1024, self.env.actionInput())
         elif variant==2:
             self.get_state = self.env.getState2
             self.dim = self.env.dim2
-        self.model = Linear_QNet(self.dim(), 256, self.env.actionInput())
+            self.model = Linear_QNet(self.dim(), 256, self.env.actionInput())
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -85,7 +86,7 @@ class Agent:
         total_score = 0
         record = 0
         self.reset()
-        while record < 50:
+        while record < 200:
             # get old state
             state_old = self.get_state()
             # get move
@@ -94,7 +95,7 @@ class Agent:
 
             # perform move and get new state
             reward, done, score = self.step(final_move)
-            self.env.renderHuman()
+            #self.env.renderHuman()
             state_new = self.get_state()
             # train short memory
             self.train_short_memory(state_old, final_move, reward, state_new, done)
@@ -159,5 +160,7 @@ class Agent:
                 self.env.reset(tttime=False)
 
 if __name__ == '__main__':
-    a = Agent(CustomEnv(30,30))
-    a.botGame()
+    #a = Agent(CustomEnv(30,30))
+    #a.train()
+    a = Agent(variant=1,env=CustomEnv(30,30))
+    a.train()
