@@ -1,13 +1,11 @@
 import time
-from games.snake.SnakeGame2 import CustomEnv, actionAsk
+from SnakeGame2 import CustomEnv, actionAsk
 import random
 import numpy as np
 from collections import deque
 from model import Linear_QNet, QTrainer
 from helper import plot
 import torch
-from game import SnakeGameAI
-from game1 import SnakeGameAI as sa
 from Bot import predictState16
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -76,7 +74,7 @@ class Agent:
             state = self.get_state()
             action = predictState16(state)
             reward, done, _ = self.env.step(actionAsk())
-            print(self.get_state())
+            #print(self.get_state())
             if done:
                 break
 
@@ -150,11 +148,11 @@ class Agent:
         self.env.reset(tttime=False)
         while True:  # Run until solved
             state = self.get_state()
-            print(state)
             action = predictState16(state)
             self.env.renderHuman()  # Adding this line would show the attempts
             time.sleep(0.01)
             reward, done, _ = self.step(action)
+            print('score is '+str(self.env.getScore()))
             if done:
                 break
                 self.env.reset(tttime=False)
@@ -162,5 +160,5 @@ class Agent:
 if __name__ == '__main__':
     #a = Agent(CustomEnv(30,30))
     #a.train()
-    a = Agent(variant=1,env=CustomEnv(30,30))
-    a.train()
+    a = Agent(variant=2,env=CustomEnv(30,30))
+    a.botGame()

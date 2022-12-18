@@ -1,24 +1,22 @@
 # %%
 import time
-from gym import Env
-from gym.spaces import Box, Discrete
 import random
 from IPython.display import clear_output
 import numpy as np
 import keyboard
-from freegames import square, vector
-import turtle as t
-
+#from freegames import square, vector
+#import turtle as t
+import pygame as p
 
 # %%
 def actionAsk():
     a = np.zeros(4,dtype=np.int64)
     if keyboard.is_pressed('Down'):
-        a[0] = 1
+        a[2] = 1
     if keyboard.is_pressed('Left'):
         a[1] = 1
     if keyboard.is_pressed('Up'):
-        a[2] = 1
+        a[0] = 1
     if keyboard.is_pressed('Right'):
         a[3] = 1
     return a
@@ -64,7 +62,7 @@ class Point2():
 
 
 # %%
-class CustomEnv(Env):
+class CustomEnv():
     def __init__(self, h=10, w=10):
         self.WIDTH = int(w)
         self.HEIGHT = int(h)
@@ -76,6 +74,8 @@ class CustomEnv(Env):
         self.startLen = 0
         self.Time = True
         self.factor = 20
+        self.display = p.display.set_mode((640, 640))
+        '''
         t.title("Snake")
         root = t.Screen()._root
         # root.iconbitmap("logo-ico.ico")
@@ -83,7 +83,7 @@ class CustomEnv(Env):
         t.setup((self.HEIGHT + 3) *  self.factor, (self.WIDTH + 3) * self.factor, 600, 0)
         t.hideturtle()
         t.tracer(False)
-
+'''
     def inside(self, head):
         return -1 < head.x < self.WIDTH and -1 < head.y < self.HEIGHT
 
@@ -153,30 +153,6 @@ class CustomEnv(Env):
             s = s + '\n'
         s = s + 'Episode:{} Score:{} Snake:{}'.format(episode, reward, len(self.snake))
         print(s)
-
-    def renderHuman(self, episode=0, reward=0):
-        factor = self.factor
-        t.clear()
-        shifty = -self.HEIGHT//2 * factor
-        shiftx = -self.WIDTH// 2 * factor
-        for i in range(0, self.WIDTH):
-            square(i * factor + shiftx, self.HEIGHT * factor + shifty , factor, '#000000')
-            square(i * factor + shiftx, -1 * factor + shifty            , factor , '#000000')
-
-        for i in range(0, self.HEIGHT):
-            square(self.WIDTH * factor + shiftx, i * factor+ shifty , factor, '#000000')
-            square(-1 * factor + shiftx        , i * factor+ shifty , factor, '#000000')
-
-        square(self.food.x * factor + shiftx, self.food.y * factor+ shifty , factor, '#cc99ff')
-
-        for s in self.snake:
-            square(s.x * factor + shiftx, s.y * factor+ shifty , factor, 'brown')
-
-        if self.endGame:
-            square(self.snake[-1].x * factor + shiftx, self.snake[-1].y * factor+ shifty , factor, 'red')
-        square(self.snake[-1].x * factor + shiftx, self.snake[-1].y * factor+ shifty , factor, 'yellow')
-
-        t.update()
 
     def position(self, pos) -> int:
         return pos.x * self.HEIGHT + pos.y
@@ -270,3 +246,66 @@ class CustomEnv(Env):
 
     def actionInput(self):
         return 4
+
+    def getScore(self):
+        return len(self.snake)
+    def renderHuman(self):
+        GREEN = (0,255,0)
+        BLACK = (0,0,0)
+        RED = (255,0,0)
+        YELLOW = (255,255,0)
+        BROWN = (204,102,0)
+        BLUE = (0,0,255)
+        s = self.factor
+        self.display.fill(GREEN)
+        p.display.set_caption('Score: '+str(len(self.snake)))
+
+        shifty = self.HEIGHT * s
+        shiftx = self.WIDTH * s
+        for i in range(-1, self.WIDTH+1):
+            p.draw.rect(self.display, BLACK, p.Rect(-i * s + shiftx + s, 0, s, s))
+            p.draw.rect(self.display, BLACK, p.Rect(-i * s + shiftx + s, shifty + s, s, s))
+
+        for i in range(-1, self.HEIGHT+1):
+            p.draw.rect(self.display, BLACK, p.Rect(0    ,  -i * s + shifty+ s, s, s))
+            p.draw.rect(self.display, BLACK, p.Rect(shiftx+ s, -i * s + shifty+ s, s, s))
+
+        p.draw.rect(self.display, RED, p.Rect(self.food.x*s+ s, self.food.y*s+ s, s, s))
+
+        for pt in self.snake:
+            p.draw.rect(self.display, YELLOW, p.Rect(pt.x*s+ s, pt.y*s+ s, s, s))
+
+
+
+        if self.endGame:
+            p.draw.rect(self.display, BLUE, p.Rect(self.snake[-1].x * s+ s, self.snake[-1].y * s+ s, s, s))
+        else:
+            p.draw.rect(self.display, BROWN, p.Rect(self.snake[-1].x * s+ s, self.snake[-1].y * s+ s, s, s))
+
+        p.display.flip()
+'''
+    def renderHuman(self, episode=0, reward=0):
+        factor = self.factor
+        t.clear()
+        shifty = -self.HEIGHT//2 * factor
+        shiftx = -self.WIDTH// 2 * factor
+        for i in range(0, self.WIDTH):
+            square(i * factor + shiftx, self.HEIGHT * factor + shifty , factor, '#000000')
+            square(i * factor + shiftx, -1 * factor + shifty            , factor , '#000000')
+
+        for i in range(0, self.HEIGHT):
+            square(self.WIDTH * factor + shiftx, i * factor+ shifty , factor, '#000000')
+            square(-1 * factor + shiftx        , i * factor+ shifty , factor, '#000000')
+
+        square(self.food.x * factor + shiftx, self.food.y * factor+ shifty , factor, '#cc99ff')
+
+        for s in self.snake:
+            square(s.x * factor + shiftx, s.y * factor+ shifty , factor, 'brown')
+
+        if self.endGame:
+            square(self.snake[-1].x * factor + shiftx, self.snake[-1].y * factor+ shifty , factor, 'red')
+        square(self.snake[-1].x * factor + shiftx, self.snake[-1].y * factor+ shifty , factor, 'yellow')
+
+        t.update()
+'''
+

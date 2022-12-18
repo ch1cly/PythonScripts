@@ -1,5 +1,4 @@
 import random
-
 import numpy as np
 from random import randint as rd
 
@@ -39,6 +38,7 @@ def randomBool1()->bool:
 
 def predictState16(state):
     action = np.zeros(4,dtype=np.int32)
+
     if np.sum(state[4:9]) == 0:
         for i in range(3):
             if state[i] == 0 and state[12+i] ==1:
@@ -107,10 +107,13 @@ def predictState16(state):
                     action[lur[i]] = 1
                     action[lur[i - 2]] = 0
             return action
-    for i in range(3):
+
+    for i in range(10):
+        i = rd(0, 2)
         if lurSnake[i] == 0 and lurCollision[i] == 0:
             action[lur[i]] = 1
             return action
+
     return action
 
 
