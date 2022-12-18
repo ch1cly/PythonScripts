@@ -11,9 +11,9 @@ class Linear_QNet(nn.Module):
         self.var = variant
         if self.var == 2:
             self.linear1 = nn.Linear(input_size, hidden_size)
-            self.linear2 = nn.Linear(hidden_size, hidden_size)
-            self.linear3 = nn.Linear(hidden_size, 32)
-            self.linear4 = nn.Linear(32, output_size)
+            self.linear2 = nn.Linear(hidden_size, hidden_size//2)
+            #self.linear3 = nn.Linear(hidden_size, 32)
+            self.linear4 = nn.Linear(hidden_size//2, output_size)
         elif self.var == 1:
             self.linear1 = nn.Linear(input_size, int(1.4*hidden_size))
             self.linear2 = nn.Linear(int(1.4*hidden_size), 2*hidden_size)
@@ -26,7 +26,7 @@ class Linear_QNet(nn.Module):
         if self.var == 2:
             x = F.relu(self.linear1(x))
             x = F.relu(self.linear2(x))
-            x = F.relu(self.linear3(x))
+            #x = F.relu(self.linear3(x))
             x = self.linear4(x)
         elif self.var == 1:
             x = F.relu(self.linear1(x))
