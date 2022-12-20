@@ -53,11 +53,14 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = int(self.env.dim1()*0.5) - self.n_games
         fmove = np.zeros(shape=self.env.actionInput(),dtype=np.int32)
-        if random.randint(0, self.env.dim1()*0.5) < self.epsilon:
+        #self.epsilon = int(self.env.dim1()*0.5) - 2*self.n_games
+        #if random.randint(0, self.env.dim1()*0.5) < self.epsilon:
+        self.epsilon = 80 - self.n_games
+        if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, self.env.actionInput()-1)
             fmove[move] = 1
+            #print(self.epsilon)
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
@@ -111,7 +114,7 @@ class Agent:
                     record = score
                     self.model.save()
 
-                print('Game', self.n_games, 'Score', score, 'Record:', record)
+                #print('Game', self.n_games, 'Score', score, 'Record:', record)
 
                 plot_scores.append(score)
                 total_score += score
@@ -129,19 +132,14 @@ class Agent:
         self.reset()
         #self.env.renderHuman()
         while True:
-            # get old state
-
             state = self.get_state()
-            # get move
             move = self.get_action(state)
-
             # perform move and get new state
             reward, done, score = self.step(move)
-            # train short memory
-            #self.env.renderHuman()
+            self.env.renderHuman()
             time.sleep(0.01)
             if done:
-                state = self.reset()
+                state = self.reset(tttime=False)
                 print('score is ', score)
 
     def botGame(self):
@@ -154,11 +152,10 @@ class Agent:
             reward, done, _ = self.step(action)
             print('score is '+str(self.env.getScore()))
             if done:
-                break
                 self.env.reset(tttime=False)
 
 if __name__ == '__main__':
-    #a = Agent(CustomEnv(30,30))
-    #a.train()
-    a = Agent(variant=2,env=CustomEnv(30,30))
-    a.botGame()
+    a = Agent(CustomEnv(30,30,pg=True))
+    a.test()
+    #a = Agent(variant=2,env=CustomEnv(30,30,pg=True))
+    #a.botGame()
