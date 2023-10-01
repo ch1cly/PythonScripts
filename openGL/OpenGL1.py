@@ -105,10 +105,10 @@ def draw():
     #glMatrixMode(GL_PROJECTION)
     offset = 0.5
     drawxy(0,0,0.2)
-    drawxy(offset/2, 0,0.2)
-    drawxy(-offset/2,0,0.2)
-    drawxy(offset/4, 0,0.2)
-    drawxy(-offset/4,0,0.2)
+    drawxy(offset/2, 0,0.1)
+    drawxy(-offset/2,0,0.1)
+    drawxy(offset/4, 0,0.05)
+    drawxy(-offset/4,0,0.05)
     glutSwapBuffers()                                           # Выводим все нарисованное в памяти на экран
 
 
