@@ -64,6 +64,14 @@ class Cube():
                 glVertex3fv(vertices[j])
         glEnd()
 
+        glLineWidth(3.0)
+        for i in range(len(surf)):
+            glBegin(GL_LINE_LOOP)
+            glColor3fv((0.0,0.0,0.0))
+            for j in surf[i]:
+                glVertex3fv(vertices[j])
+            glEnd()
+        
         glPopMatrix()
 
 class EntireCube():
@@ -149,7 +157,7 @@ def main():
     gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
 
     #first parameter is shape of cube!!!
-    NewEntireCube = EntireCube(1, 1.5)
+    NewEntireCube = EntireCube(4, 1.5)
     NewEntireCube.mainloop()
 
 if __name__ == '__main__':
