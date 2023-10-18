@@ -4,6 +4,7 @@ from pygame.locals import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from random import randint as ri
 
 '''
 На примере готового кубик-рубика рассмотреть обработку клавиш для вращения граней,
@@ -74,6 +75,7 @@ class Cube():
         
         glPopMatrix()
 
+
 class EntireCube():
     def __init__(self, N, scale):
         self.N = N
@@ -84,16 +86,19 @@ class EntireCube():
 
         
         rot_cube_map  = { K_UP: (-1, 0), K_DOWN: (1, 0), K_LEFT: (0, -1), K_RIGHT: (0, 1)}
-        
         if self.N == 3:
             rot_slice_map = {
-                K_1: (0, 0, 1),   K_2: (0, 1, 1),   K_3: (0, 2, 1), 
-                K_4: (1, 0, 1),   K_5: (1, 1, 1),   K_6: (1, 2, 1), 
-                K_7: (2, 0, 1),   K_8: (2, 1, 1),   K_9: (2, 2, 1),
-                K_F1: (0, 0, -1), K_F2: (0, 1, -1), K_F3: (0, 2, -1),
-                K_F4: (1, 0, -1), K_F5: (1, 1, -1), K_F6: (1, 2, -1), 
-                K_F7: (2, 0, -1), K_F8: (2, 1, -1), K_F9: (2, 2, -1),
-            }  
+                K_1: (0, 0, 1),  K_q: (0, 1, 1),  K_a: (0, 2, 1), 
+                K_2: (0, 0, -1), K_w: (0, 1, -1), K_s: (0, 2, -1),
+                K_3: (1, 0, 1),  K_e: (1, 1, 1),  K_d: (1, 2, 1), 
+                K_4: (1, 0, -1), K_r: (1, 1, -1), K_f: (1, 2, -1),
+                K_5: (2, 0, 1),  K_t: (2, 1, 1),  K_g: (2, 2, 1),  
+                K_6: (2, 0, -1), K_y: (2, 1, -1), K_h: (2, 2, -1)
+            }
+            #delete, not for homeWork! 
+            kkeys = (K_1, K_q, K_a, K_2, K_w, K_s, K_3, K_e,
+                     K_d, K_4, K_r, K_f, K_5, K_t, K_g, K_6, 
+                     K_y,K_h)  
         elif self.N == 4:
             rot_slice_map = {
                 K_1: (0, 0, 1),  K_q: (0, 1, 1),  K_a: (0, 2, 1),  K_z: (0, 3, 1),
@@ -101,22 +106,61 @@ class EntireCube():
                 K_3: (1, 0, 1),  K_e: (1, 1, 1),  K_d: (1, 2, 1),  K_c: (1, 3, 1),
                 K_4: (1, 0, -1), K_r: (1, 1, -1), K_f: (1, 2, -1), K_v: (1, 3, -1),
                 K_5: (2, 0, 1),  K_t: (2, 1, 1),  K_g: (2, 2, 1),  K_b: (2, 3, 1),
-                K_6: (2, 0, -1), K_y: (2, 1, -1), K_h: (2, 2, -1), K_n: (2, 3, -1),
-            } 
+                K_6: (2, 0, -1), K_y: (2, 1, -1), K_h: (2, 2, -1), K_n: (2, 3, -1)
+            }
+            #delete, not for homeWork! 
+            kkeys = (K_1, K_q, K_a, K_z, K_2, K_w, K_s, K_x, K_3, K_e, 
+                     K_d, K_c, K_4, K_r, K_f, K_v, K_5, K_t, K_g, K_b, 
+                     K_6, K_y,K_h, K_n)
+            
+
+        
         ang_x, ang_y, rot_cube = 0, 0, (0, 0)
         animate, animate_ang, animate_speed = False, 0, 5
         action = (0, 0, 0)
+        rot_memory_stack = [] #added stack to remember actions
+        isK_kPressed = False #flag Added
         while True:
+            if isK_kPressed: #if glag 
+                if len(rot_memory_stack) > 0 and not animate: #if not rotated
+                    temp_rot = list(rot_slice_map[rot_memory_stack[-1]]) #take button
+                    rot_memory_stack.pop()
+                    temp_rot[-1] = temp_rot[-1]*-1
+                    animate, action = True, tuple(temp_rot) #animate
+                if len(rot_memory_stack) == 0: #no things to animate
+                    isK_kPressed = False
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+
                 if event.type == KEYDOWN:
                     if event.key in rot_cube_map:
                         rot_cube = rot_cube_map[event.key]
-                    if not animate and event.key in rot_slice_map:
-                        animate, action = True, rot_slice_map[event.key]
+
+                    if not animate and event.key == K_k: #if 'k' is pressed
+                        isK_kPressed = True
+                        
+                    if not animate and not isK_kPressed \
+                        and (event.key in rot_slice_map or event.key == K_o) :
+                        if event.key != K_o:                  #delete, not for homeWork! 
+                            t_key = event.key
+                        else:                                 #delete, not for homeWork! 
+                            t_key = kkeys[ri(0,len(kkeys)-1)] #delete, not for homeWork!  
+
+                        animate, action = True, rot_slice_map[t_key]
+                        flag = True
+
+                        if len(rot_memory_stack) > 0:       
+                            #delete, not for homeWork! 
+                            t_key1,t_key2 = list(rot_slice_map[t_key]),list(rot_slice_map[rot_memory_stack[-1]])  #delete, not for homeWork! 
+                            t_key1[-1] = t_key1[-1]*-1      #delete, not for homeWork! 
+                            flag = not t_key1 == t_key2     #delete, not for homeWork! 
+                        if flag:
+                            rot_memory_stack.append(t_key) #remember key
+                        else:                               #delete, not for homeWork! 
+                            rot_memory_stack.pop()          #delete, not for homeWork! 
                 if event.type == KEYUP:
                     if event.key in rot_cube_map:
                         rot_cube = (0, 0)
