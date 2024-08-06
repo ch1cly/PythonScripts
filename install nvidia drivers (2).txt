@@ -1,0 +1,95 @@
+
+sudo nano /etc/apt/apt.conf.d/20auto-upgrades
+
+# открываем файл настроек grub в текстовом редакторе
+sudo editor /etc/default/grub
+# добавляем параметр pcie_aspm=off
+GRUB_CMDLINE_LINUX_DEFAULT="quiet pcie_aspm=off"
+# сохраняем и обновляем загрузчик
+sudo update-grub
+
+sudo apt update
+sudo apt install nvidia-driver-510-server
+sudo apt install nvidia-cuda-toolkit
+sudo apt install nvidia-cuda-dev
+
+curl https://get.docker.com | sh \
+  && sudo systemctl --now enable docker
+
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)       && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg       && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list |             sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |             sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+sudo systemctl restart docker
+
+reboot
+
+# Для разгона
+sudo apt install nvidia-driver-510
+sudo systemctl enable multi-user.target --force
+sudo systemctl set-default multi-user.target
+
+sudo
+
+sudo nvidia-xconfig -a --cool-bits=28 --allow-empty-initial-configuration
+
+sudo nano /etc/X11/xorg.conf
+--->Section "ServerLayout"  
+		Identifier    "Layout0"     
+		#   Our real monitor
+		Screen 0      "Screen0" 0 0     
+	#   Our virtual monitors
+		Screen 1      "Screen1"     
+		Screen 2      "Screen2"
+	#    ....
+		Screen N      "ScreenN"  
+
+		InputDevice   "Keyboard0" "CoreKeyboard"
+		InputDevice   "Mouse0"    "CorePointer" 
+	EndSection
+
+reboot
+
+
+DISPLAY=:0
+
+#sudo XAUTHORITY=/run/user/124/gdm/Xauthority nvidia-settings -a /GPUGraphicsClockOffsetAllPerformanceLevels=200
+
+sudo /usr/bin/Xorg &
+sudo nvidia-settings -a /GPUGraphicsClockOffsetAllPerformanceLevels=100
+#sudo nvidia-settings -a /GPUGraphicsClockOffsetAllPerformanceLevels=100
+
+sudo nvidia-smi -pm 1
+sudo nvidia-smi --power-limit=250
+sudo nvidia-smi -lgc 100,2000
+
+
+sudo nvidia-settings -a /GPUMemoryTransferRateOffsetAllPerformanceLevels=-1000
+
+
+
+Удаление установка и перезапуск:
+sudo add-apt-repository ppa:graphics-drivers/ppa
+
+sudo apt-get --purge remove "*nvidia*"
+sudo apt remove --autoremove nvidia-*
+
+sudo apt update
+sudo apt install nvidia-driver-550
+
+sudo lsof /dev/nvidia*
+sudo kill -9 *всех*
+
+lsmod | grep nvidia
+sudo rmmod *всех*
+
+nvidia-smi
+
+sudo systemctl enable multi-user.target --force
+sudo systemctl set-default multi-user.target
+
+sudo apt install nvidia-container-toolkit
+
+Ребутнуть gpu-share в кубере
+
+
+
